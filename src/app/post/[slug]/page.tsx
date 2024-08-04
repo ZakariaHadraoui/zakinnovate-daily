@@ -15,7 +15,7 @@ type props ={
 
 export async function generateMetadata({
 	params
-  }: Params): Promise<Metadata | undefined> {
+  }): Promise<Metadata | undefined> {
 	try {
 	  const query = groq`*[_type == "post" && slug.current == $slug][0]{
 		... ,
