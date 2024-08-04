@@ -5,6 +5,7 @@ import Image from 'next/image';
 import urlFor from '@/sanity/lib/image';
 import {PortableText} from '@portabletext/react'
 import { RichTextComponents } from '@/components/RichTextComponents';
+import { Metadata } from 'next';
 
 type props ={
 	params:{
@@ -12,7 +13,35 @@ type props ={
 	}
 }
 
+export async function generateMetadata({
+	params
+  }: Params): Promise<Metadata | undefined> {
+	try {
+	  const query = groq`*[_type == "post" && slug.current == $slug][0]{
+		... ,
+		author->,
+		categories[]->,
+	  }`;
+	  const post = await client.fetch(query, { slug: params.slug, revalidate: 60 });
+  
+	  if (!post) {
+		return undefined;
+	  }
+  
+	  return {
+		title: post.title,
+		description: post.description,
+	  };
+	} catch (error) {
+	  console.error(error);
+	  return undefined;
+	}
+  }
+  
+
 async function PostPage({params:{slug}}:props) {
+
+	
 	const query = groq`*[_type == "post" && slug.current == $slug][0]{
 		... ,
 		author->,
